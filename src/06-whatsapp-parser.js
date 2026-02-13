@@ -40,4 +40,68 @@
  */
 export function parseWhatsAppMessage(message) {
   // Your code here
+  if (typeof message !== "string") return null;
+
+  // Required delimiters
+  const commaIndex = message.indexOf(", ");
+  const dashIndex = message.indexOf(" - ");
+  const colonIndex = message.indexOf(": ", dashIndex + 3);
+
+  if (commaIndex === -1 || dashIndex === -1 || colonIndex === -1) {
+    return null;
+  }
+
+  // Extract segments
+  const date = message.slice(0, commaIndex);
+
+  const time = message.slice(
+    commaIndex + 2,
+    dashIndex
+  );
+
+  const sender = message.slice(
+    dashIndex + 3,
+    colonIndex
+  );
+
+  const text = message
+    .slice(colonIndex + 2)
+    .trim();
+
+  // Word count
+  const wordCount = text
+    .split(" ")
+    .filter(word => word.trim() !== "")
+    .length;
+
+  // Sentiment detection
+  const lowerText = text.toLowerCase();
+
+  const funnyKeywords = ["😂", ":)", "haha"];
+  const loveKeywords = ["❤", "love", "pyaar"];
+
+  let sentiment = "neutral";
+
+  const isFunny = funnyKeywords.some(k =>
+    lowerText.includes(k.toLowerCase())
+  );
+
+  const isLove = loveKeywords.some(k =>
+    lowerText.includes(k.toLowerCase())
+  );
+
+  if (isFunny) {
+    sentiment = "funny";        // priority
+  } else if (isLove) {
+    sentiment = "love";
+  }
+
+  return {
+    date,
+    time,
+    sender,
+    text,
+    wordCount,
+    sentiment
+  };
 }
